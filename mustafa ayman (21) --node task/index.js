@@ -1,0 +1,20 @@
+import express from "express";
+
+import { dbConnection } from "./database/dbConnection.js";
+import userRouter from "./src/modules/user/user.router.js";
+import todoRouter from "./src/modules/todo/todo.router.js";
+import morgan from "morgan";
+import { authUser } from "./src/middleware/auth.js";
+import authRouter from "./src/modules/auth/auth.js";
+import dotenv from "dotenv";
+dotenv.config();
+const app = express();
+const port = process.env.API_PORT;
+dbConnection();
+app.use(morgan("tiny"));
+app.use(express.json());
+app.use(authRouter);
+app.use("/users", authUser, userRouter);
+app.use("/todo", authUser, todoRouter);
+app.get("/", (req, res) => res.send("Hello World!"));
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
